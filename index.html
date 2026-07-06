@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Кто хочет стать миллионером?</title>
+    <title>Кто хочет стать миллионером? с полной озвучкой</title>
     <style>
         :root {
             --bg-main: #0c0c14;
@@ -22,19 +22,17 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Arial', sans-serif; }
         body { background-color: var(--bg-main); color: var(--text); display: flex; height: 100vh; overflow: hidden; }
 
-        /* Игровая зона */
         .game-panel { flex: 1; display: flex; flex-direction: column; padding: 25px; justify-content: space-between; }
         
-        /* Подсказки */
         .lifelines-row { display: flex; gap: 15px; justify-content: flex-start; margin-bottom: 10px; }
         .lifeline-btn { background-color: var(--blue); color: white; border: 1px solid var(--accent); padding: 8px 16px; border-radius: 20px; font-weight: bold; cursor: pointer; transition: all 0.2s; font-size: 13px; }
         .lifeline-btn:hover:not(:disabled) { background-color: var(--blue-hover); transform: scale(1.05); }
         .lifeline-btn:disabled { background-color: #222; border-color: #444; color: #555; cursor: not-allowed; text-decoration: line-through; }
 
-        /* Ведущий */
+        .audio-control { margin-left: auto; background: #222; border: 1px solid #444; border-radius: 5px; color: #fff; padding: 5px 10px; font-size: 12px; cursor: pointer; }
+
         .host-monitor { background-color: var(--bg-dark); border-radius: 6px; padding: 12px 15px; font-style: italic; color: #39ff14; font-family: 'Courier New', monospace; min-height: 60px; border-left: 4px solid var(--accent); margin-bottom: 15px; font-size: 14px; display: flex; align-items: center; }
         
-        /* Вопрос и ответы */
         .question-box { background-color: var(--bg-panel); padding: 25px; border-radius: 8px; font-size: 18px; font-weight: bold; text-align: center; border: 1px solid #2a2a3a; box-shadow: 0 4px 15px rgba(0,0,0,0.5); margin-bottom: 15px; line-height: 1.4; }
         
         .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
@@ -46,7 +44,6 @@
         .option-btn.wrong { background-color: var(--red); border-color: var(--red); }
         .option-btn.removed { visibility: hidden; pointer-events: none; }
 
-        /* Правая панель (Деньги) */
         .side-panel { width: 260px; background-color: var(--bg-dark); display: flex; flex-direction: column; padding: 20px 0; border-left: 1px solid #1a1a24; }
         .side-title { text-align: center; font-size: 14px; font-weight: bold; color: var(--accent); margin-bottom: 20px; letter-spacing: 1px; }
         .ladder { display: flex; flex-direction: column-reverse; flex: 1; justify-content: center; }
@@ -54,19 +51,17 @@
         .ladder-step.milestone { color: var(--accent); }
         .ladder-step.active { background-color: var(--blue); color: #fff !important; border-radius: 4px; }
 
-        /* Финал */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); align-items: center; justify-content: center; z-index: 100; }
-        .modal-content { background: var(--bg-panel); padding: 40px; border-radius: 12px; text-align: center; max-width: 450px; border: 2px solid var(--accent); box-shadow: 0 0 25px rgba(255,215,0,0.2); }
+        .modal { display: flex; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); align-items: center; justify-content: center; z-index: 100; }
+        .modal-content { background: var(--bg-panel); padding: 40px; border-radius: 12px; text-align: center; max-width: 450px; border: 2px solid var(--accent); }
         .modal h2 { color: var(--accent); margin-bottom: 15px; }
         .modal p { font-size: 16px; margin-bottom: 25px; line-height: 1.5; }
-        .btn-restart { background-color: var(--green); color: white; border: none; padding: 12px 30px; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; }
+        .btn-start { background-color: var(--green); color: white; border: none; padding: 12px 30px; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; }
 
         @keyframes blink {
             0%, 100% { background-color: var(--green); }
             50% { background-color: #1e1e2a; }
         }
 
-        /* Адаптивность для телефонов */
         @media(max-width: 768px) {
             body { flex-direction: column-reverse; overflow-y: auto; height: auto; }
             .side-panel { width: 100%; height: auto; padding: 10px 0; }
@@ -79,44 +74,164 @@
 <body>
 
     <div class="game-panel">
-        <!-- Блок подсказок -->
         <div class="lifelines-row">
             <button class="lifeline-btn" id="life-50" onclick="use5050()">50 : 50</button>
             <button class="lifeline-btn" id="life-hall" onclick="useHall()">Помощь зала</button>
             <button class="lifeline-btn" id="life-call" onclick="useCall()">Звонок другу</button>
+            <button class="audio-control" id="mute-btn" onclick="toggleMute()">🔊 Звук: Вкл</button>
         </div>
 
-        <!-- Реплики ведущего -->
-        <div class="host-monitor" id="host-text">Дмитрий Дибров: Приветствую вас в кресле игрока! Посмотрим, сможете ли вы забрать миллион. Вот ваш первый вопрос.</div>
+        <div class="host-monitor" id="host-text">Ведущий: Добро пожаловать на шоу! Готовы побороться за один миллион рублей? Нажмите «Начать игру»!</div>
 
-        <!-- Экран вопроса -->
-        <div class="question-box" id="question">Загрузка...</div>
+        <div class="question-box" id="question">Нажмите кнопку старта ниже, чтобы включить студию и запустить озвучку.</div>
         
-        <!-- Сетка ответов -->
         <div class="options-grid">
-            <button class="option-btn" id="opt-0" onclick="selectOption(0)">A: </button>
-            <button class="option-btn" id="opt-1" onclick="selectOption(1)">B: </button>
-            <button class="option-btn" id="opt-2" onclick="selectOption(2)">C: </button>
-            <button class="option-btn" id="opt-3" onclick="selectOption(3)">D: </button>
+            <button class="option-btn" id="opt-0" onclick="selectOption(0)" disabled>A: </button>
+            <button class="option-btn" id="opt-1" onclick="selectOption(1)" disabled>B: </button>
+            <button class="option-btn" id="opt-2" onclick="selectOption(2)" disabled>C: </button>
+            <button class="option-btn" id="opt-3" onclick="selectOption(3)" disabled>D: </button>
         </div>
     </div>
 
-    <!-- Лестница денег -->
     <div class="side-panel">
         <div class="side-title">ТЕКУЩИЙ СЧЕТ</div>
         <div class="ladder" id="ladder"></div>
     </div>
 
-    <!-- Окно конца игры -->
     <div class="modal" id="modal">
         <div class="modal-content">
-            <h2 id="modal-title">Игра окончена</h2>
-            <p id="modal-text"></p>
-            <button class="btn-restart" onclick="resetGame()">Играть снова</button>
+            <h2 id="modal-title">Интеллектуальное Шоу</h2>
+            <p id="modal-text">Добро пожаловать в кресло игрока. Вопросы и реплики ведущего будут полностью озвучены.</p>
+            <button class="btn-start" id="start-btn" onclick="startGame()">Начать игру</button>
         </div>
     </div>
 
     <script>
+        // --- ЗВУКОВОЙ ДВИЖОК (Web Audio API + Речевой синтез) ---
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        let bgOsc = null;
+        let bgGain = null;
+        let isMuted = false;
+
+        // Функция для чтения текста голосом
+        function speak(text) {
+            if (isMuted) return;
+            
+            // Останавливаем текущее говорение, если оно идет
+            window.speechSynthesis.cancel();
+            
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'ru-RU';
+            utterance.rate = 1.0; // Скорость речи
+            utterance.pitch = 0.9; // Чуть ниже тон для авторитетности ведущего
+
+            // Приглушаем музыку, пока говорит ведущий
+            if (bgGain) bgGain.gain.setValueAtTime(0.03, audioCtx.currentTime);
+
+            utterance.onend = () => {
+                // Возвращаем громкость музыки, когда ведущий закончил говорить
+                if (bgGain && !isMuted && !isAnswering) {
+                    bgGain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                }
+            };
+
+            window.speechSynthesis.speak(utterance);
+        }
+
+        function playSound(type) {
+            if (isMuted) return;
+            const now = audioCtx.currentTime;
+            
+            if (type === 'think_bg') {
+                if (bgOsc) return;
+                bgOsc = audioCtx.createOscillator();
+                bgGain = audioCtx.createGain();
+                bgOsc.type = 'sawtooth';
+                bgOsc.frequency.setValueAtTime(55, now);
+                
+                const filter = audioCtx.createBiquadFilter();
+                filter.type = 'lowpass';
+                filter.frequency.setValueAtTime(140, now);
+
+                bgGain.gain.setValueAtTime(0.15, now);
+                
+                bgOsc.connect(filter);
+                filter.connect(bgGain);
+                bgGain.connect(audioCtx.destination);
+                bgOsc.start();
+            }
+            
+            if (type === 'select') {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(220, now);
+                osc.frequency.exponentialRampToValueAtTime(110, now + 0.5);
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.linearRampToValueAtTime(0, now + 0.5);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(now + 0.5);
+            }
+
+            if (type === 'correct') {
+                const notes = [261.63, 329.63, 392.00, 523.25];
+                notes.forEach((freq, index) => {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(freq, now + index * 0.1);
+                    gain.gain.setValueAtTime(0.2, now + index * 0.1);
+                    gain.gain.linearRampToValueAtTime(0, now + index * 0.1 + 0.4);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(now + index * 0.1);
+                    osc.stop(now + index * 0.1 + 0.4);
+                });
+            }
+
+            if (type === 'wrong') {
+                const osc1 = audioCtx.createOscillator();
+                const osc2 = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc1.type = 'sawtooth';
+                osc2.type = 'sawtooth';
+                osc1.frequency.setValueAtTime(120, now);
+                osc2.frequency.setValueAtTime(117, now);
+                gain.gain.setValueAtTime(0.4, now);
+                gain.gain.linearRampToValueAtTime(0, now + 1.5);
+                osc1.connect(gain);
+                osc2.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc1.start();
+                osc2.start();
+                osc1.stop(now + 1.5);
+                osc2.stop(now + 1.5);
+            }
+        }
+
+        function stopBgSound() {
+            if (bgOsc) {
+                try { bgOsc.stop(); } catch(e){}
+                bgOsc = null;
+            }
+        }
+
+        function toggleMute() {
+            isMuted = !isMuted;
+            document.getElementById('mute-btn').innerText = isMuted ? "🔇 Звук: Выкл" : "🔊 Звук: Вкл";
+            if (isMuted) {
+                stopBgSound();
+                window.speechSynthesis.cancel();
+            } else {
+                if (currentStep < 15 && document.getElementById('modal').style.display !== 'flex') {
+                    playSound('think_bg');
+                }
+            }
+        }
+
+        // --- ИГРОВАЯ ЛОГИКА ---
         const QUESTIONS = [
             {q: "Какая планета третья от Солнца?", a: ["Марс", "Венера", "Земля", "Меркурий"], correct: 2},
             {q: "Сколько букв в русском алфавите?", a: ["32", "33", "34", "30"], correct: 1},
@@ -153,6 +268,13 @@
             }
         }
 
+        function startGame() {
+            audioCtx.resume();
+            document.getElementById('modal').style.display = 'none';
+            playSound('think_bg');
+            loadQuestion();
+        }
+
         function loadQuestion() {
             isAnswering = false;
             const q = QUESTIONS[currentStep];
@@ -171,6 +293,10 @@
                 el.classList.remove('active');
                 if (i === currentStep + 1) el.classList.add('active');
             }
+
+            const hostAnnouncement = `Вопрос номер ${currentStep + 1} на ${MONEY_LADDER[currentStep + 1]} рублей. ${q.q}. Варианты ответов. А: ${q.a[0]}. Бэ: ${q.a[1]}. Цэ: ${q.a[2]}. Дэ: ${q.a[3]}.`;
+            setHostText(`Вопрос на ${MONEY_LADDER[currentStep + 1]} рублей. Время пошло...`);
+            speak(hostAnnouncement);
         }
 
         function setHostText(text) {
@@ -181,29 +307,43 @@
             if (isAnswering) return;
             isAnswering = true;
 
-            // Блокируем кнопки
+            playSound('select');
+            window.speechSynthesis.cancel(); // Обрываем чтение вопроса, если игрок ответил раньше
+
+            if (bgGain) bgGain.gain.setValueAtTime(0.02, audioCtx.currentTime);
+
             for (let i = 0; i < 4; i++) document.getElementById(`opt-${i}`).disabled = true;
 
             const selectedBtn = document.getElementById(`opt-${idx}`);
             selectedBtn.classList.add('selected');
             
-            setHostText("Вы приняли решение... Это ваш окончательный ответ? Внимание на экран...");
+            const selectedLetter = ["A", "B", "C", "D"][idx];
+            setHostText(`Принят ответ ${selectedLetter}. Минутку...`);
+            speak(`Вы выбрали вариант ${selectedLetter}. Посмотрим, верный ли это выбор...`);
 
             setTimeout(() => {
                 const q = QUESTIONS[currentStep];
                 if (idx === q.correct) {
+                    stopBgSound();
+                    playSound('correct');
                     selectedBtn.className = 'option-btn correct';
-                    setHostText(`Абсолютно верно! Вы выигрываете ${MONEY_LADDER[currentStep + 1]} рублей! Переходим к следующему вопросу.`);
+                    
+                    const winText = `И это правильный ответ! Вы зарабатываете ${MONEY_LADDER[currentStep + 1]} рублей!`;
+                    setHostText(winText);
+                    speak(winText);
                     
                     setTimeout(() => {
                         currentStep++;
                         if (currentStep === 15) {
-                            showModal("ВЫ МИЛЛИОНЕР!", `Невероятно! Вы ответили на все 15 вопросов и выиграли главный приз шоу — ${MONEY_LADDER[15]} рублей! Зал аплодирует стоя!`);
+                            showModal("ТРИУМФ!", `Невероятно! Вы ответили на все 15 вопросов и выиграли ${MONEY_LADDER[15]} рублей!`);
                         } else {
+                            playSound('think_bg');
                             loadQuestion();
                         }
-                    }, 2000);
+                    }, 4000);
                 } else {
+                    stopBgSound();
+                    playSound('wrong');
                     selectedBtn.className = 'option-btn wrong';
                     document.getElementById(`opt-${q.correct}`).className = 'option-btn correct';
                     
@@ -211,88 +351,58 @@
                     if (currentStep >= 10) guaranteed = MONEY_LADDER[10];
                     else if (currentStep >= 5) guaranteed = MONEY_LADDER[5];
 
-                    setHostText(`К сожалению, это ошибка. Правильный ответ был под буквой ${["A","B","C","D"][q.correct]}.`);
+                    const loseText = `К сожалению, это ошибка. Правильный ответ — ${["A","B","C","D"][q.correct]}.`;
+                    setHostText(loseText);
+                    speak(loseText + ` Ваш несгораемый выигрыш составляет ${guaranteed} рублей. Игра окончена.`);
                     
                     setTimeout(() => {
-                        showModal("Игра окончена", `Вы допустили ошибку на вопросе №${currentStep + 1}.\n\nВаш несгораемый выигрыш: ${guaranteed} рублей.`);
-                    }, 2000);
+                        showModal("Игра окончена", `Вы срезались на вопросе №${currentStep + 1}.\n\nВаш чистый выигрыш: ${guaranteed} рублей.`);
+                    }, 5000);
                 }
-            }, 1500);
+            }, 3500); // Чуть увеличил задержку ответа, чтобы дать ведущему договорить фразу
         }
 
-        // Подсказка 50:50
         function use5050() {
             document.getElementById('life-50').disabled = true;
+            playSound('select');
             const q = QUESTIONS[currentStep];
             let wrong = [0,1,2,3].filter(i => i !== q.correct);
             wrong.sort(() => Math.random() - 0.5);
-            
-            // Прячем два случайных неверных ответа
             document.getElementById(`opt-${wrong[0]}`).classList.add('removed');
             document.getElementById(`opt-${wrong[1]}`).classList.add('removed');
-            setHostText("Компьютер убрал два заведомо неверных ответа. У вас осталось два варианта.");
+            speak("Убираем два неверных варианта.");
         }
 
-        // Подсказка Помощь зала
         function useHall() {
             document.getElementById('life-hall').disabled = true;
+            playSound('select');
             const q = QUESTIONS[currentStep];
-            const letters = ["A", "B", "C", "D"];
-            
-            let votes = [0, 0, 0, 0];
-            // Зал с высокой вероятностью (но не 100%) голосует за верный ответ
-            let correctVotes = Math.floor(Math.random() * 25) + 45; // 45-70%
-            votes[q.correct] = correctVotes;
-            
-            let remaining = 100 - correctVotes;
-            let wrongIndices = [0,1,2,3].filter(i => i !== q.correct);
-            
-            let v1 = Math.floor(Math.random() * remaining);
-            votes[wrongIndices[0]] = v1;
-            remaining -= v1;
-            
-            let v2 = Math.floor(Math.random() * remaining);
-            votes[wrongIndices[1]] = v2;
-            votes[wrongIndices[2]] = remaining - v2;
-
-            setHostText(`Результаты опроса трибун: А — ${votes[0]}%, B — ${votes[1]}%, C — ${votes[2]}%, D — ${votes[3]}%. Большинство склоняется к варианту ${letters[q.correct]}.`);
+            const letter = ["A","B","C","D"][q.correct];
+            const text = `Большинство зрителей в зале выбирают вариант ${letter}.`;
+            setHostText(text);
+            speak(text);
         }
 
-        // Подсказка Звонок другу
         function useCall() {
             document.getElementById('life-call').disabled = true;
+            playSound('select');
             const q = QUESTIONS[currentStep];
-            const letters = ["A", "B", "C", "D"];
-            
-            // На легких вопросах друг уверен, на сложных может сомневаться
-            let isFriendRight = Math.random() < (0.9 - (currentStep * 0.04));
-            let friendAnswer = isFriendRight ? q.correct : [0,1,2,3].filter(i => i !== q.correct)[0];
-
-            if (isFriendRight) {
-                setHostText(`Друг на проводе: 'Я уверен на 90%, что правильный ответ — это ${letters[friendAnswer]}. Точно тебе говорю!'`);
-            } else {
-                setHostText(`Друг на проводе: 'Слушай, времени мало... Мне кажется, это ${letters[friendAnswer]}, но я совсем не уверен, лучше возьми еще подсказку.'`);
-            }
+            const letter = ["A","B","C","D"][q.correct];
+            const text = `Друг на проводе считает, что правильный ответ — это ${letter}.`;
+            setHostText(text);
+            speak(text);
         }
 
         function showModal(title, text) {
+            stopBgSound();
+            window.speechSynthesis.cancel();
             document.getElementById('modal-title').innerText = title;
             document.getElementById('modal-text').innerText = text;
+            document.getElementById('start-btn').innerText = "Играть снова";
             document.getElementById('modal').style.display = 'flex';
         }
 
-        function resetGame() {
-            currentStep = 0;
-            document.getElementById('life-50').disabled = false;
-            document.getElementById('life-hall').disabled = false;
-            document.getElementById('life-call').disabled = false;
-            document.getElementById('modal').style.display = 'none';
-            setHostText("Начинаем новую игру! Перед вами первый вопрос.");
-            loadQuestion();
-        }
-
         initLadder();
-        loadQuestion();
     </script>
 </body>
 </html>
